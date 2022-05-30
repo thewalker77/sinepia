@@ -1,0 +1,64 @@
+use std::str::FromStr;
+use sinepia_lambda::{Uinf, ast::*};
+grammar;
+use std::marker::PhantomData;
+
+pub Stmt: Statement = {
+    "axiom" <v: Var> ":" <e: Expr> => Statement::Axiom(Axiom{
+        name: v,
+        typ: e
+    }),
+    <v: Var> "=" <e: Expr> => Statement::PF(Proof {
+        name: v,
+        value: e
+    }),
+    "theorem" <v: Var> ":" <t: Expr> => Statement::TH(Theorem{
+        name: v,
+        typ: t,
+    }),
+}
+pub Expr: Expr = {
+    <v: Var> => Expr::Var(v),
+    <u: Uni> => Expr::Uni(u),
+    <a: App> => Expr::App(a),
+    <l: Lambda> => Expr::Lambda(l),
+    <p: Pi> => Expr::Pi(p)
+}
+
+pub App: Application = {
+    "(" <e1: Expr> <e2: Expr> ")" =>
+        Application {
+            e1: Box::new(e1),
+            e2: Box::new(e2)
+        }
+}
+pub Lambda: Lambda = {
+    "lambda" "(" <v: Var> ":" <t: Expr> ")" "," <e: Expr> =>
+        Lambda {
+            x: v,
+            t: Box::new(t),
+            e: Box::new(e),
+            _ty: PhantomData
+        }
+}
+
+pub Pi: Pi = {
+    "forall" "("<v: Var> ":" <t: Expr> ")" "," <e: Expr> =>
+        Pi {
+            x: v,
+            t: Box::new(t),
+            e: Box::new(e),
+            _ty: PhantomData
+        }
+}
+
+pub Var: Variable = {
+    <name: Ident> => Variable::Str(StrVar{name})
+}
+pub Uni: Universe = {
+    "type"  <level: Num>  => Universe{level}
+}
+
+Num: Uinf =
+    <s:r"[0-9]+"> => Uinf::from_str(s).unwrap();
+Ident: String = <s:r"[a-zA-Z_][a-zA-Z_0_9]*"> => s.to_owned();
