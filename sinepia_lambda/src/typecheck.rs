@@ -68,7 +68,7 @@ impl TypeInfer for Lambda {
 ///```text
 ///             Γ |- m : (Π x: A, Y)       Γ |- n : A
 ///         ----------------------------------------------
-///                       Γ |- m n : B[x/n]
+///                       Γ |- m n : Y[n/x]
 ///```
 impl TypeInfer for Application {
     fn type_infer(&self, ctx: Context, trk: &mut SubstTracker) -> Option<Expr> {

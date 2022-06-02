@@ -30,7 +30,8 @@ impl Normalize for Application {
                 let mut e1 = l.e.clone();
                 e1.subst(&l.x, &e2, trk);
                 e1.normalize(ctx, trk)
-            }
+            },
+            //unreachable ?
             e1 => Some(Expr::App(Application {
                 e1: Box::new(e1),
                 e2: Box::new(e2),
